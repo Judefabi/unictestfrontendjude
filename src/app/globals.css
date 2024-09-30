@@ -13,7 +13,7 @@ body {
 }
 
 @layer base {
-  :root {
+  .dark {
     --background: 0 0% 100%;
     --foreground: 224 71.4% 4.1%;
     --card: 0 0% 100%;
@@ -40,7 +40,7 @@ body {
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
   }
-  .dark {
+  :root {
     --background: 224 71.4% 4.1%;
     --foreground: 210 20% 98%;
     --card: 224 71.4% 4.1%;
@@ -68,11 +68,74 @@ body {
   }
 }
 
+.scroll-bar {
+  /* height: calc(100vh - 100px);
+  max-height: calc(100vh - 100px); */
+  overflow: hidden;
+  position: relative;
+}
+
+.scroll-bar:hover {
+  overflow-y: auto;
+}
+
+.scroll-bar::-webkit-scrollbar {
+  width: 4px;
+  height: 5px;
+}
+
+.scroll-bar::-webkit-scrollbar-thumb {
+  background: hsla(0 0% 25.1%);
+  border-radius: 8px;
+}
+
+.scroll-bar::-webkit-scrollbar-thumb:hover {
+  background-color: hsla(0 0% 25.1%);
+}
+
+/* Horizontal scrollbar class if needed */
+.scroll-bar-x {
+  height: calc(100vh - 100px);
+  max-height: calc(100vh - 100px);
+}
+
+.scroll-bar-x:hover {
+  overflow-x: auto;
+}
+
 @layer base {
   * {
     @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
+  }
+  h1 {
+    @apply text-body-large;
+  }
+  h3 {
+    @apply capitalize font-inter text-label-large;
+  }
+  li {
+    @apply capitalize text-body-medium;
+  }
+  p {
+    @apply w-full text-body-medium font-inter font-normal tracking-[0.25px] leading-5;
+  }
+  .section {
+    @apply rounded-xl h-[869px] p-4 flex flex-col mr-2;
+  }
+}
+
+@layer utilities {
+  /* Hide scrollbar for Chrome, Safari, and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbar for IE, Edge, and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
   }
 }
