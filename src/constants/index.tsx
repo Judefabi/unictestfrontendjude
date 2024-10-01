@@ -3,7 +3,7 @@ import { RiBookFill, RiHistoryFill, RiUploadCloudLine } from "react-icons/ri";
 export const DASHBOARD_ITEMS = [
   {
     path: "/recents",
-    name: "Recents",
+    label: "Recents",
     icon: RiHistoryFill,
   },
   {
@@ -35,5 +35,6 @@ export const DASHBOARD_ITEMS = [
   {
     label: "App Files",
     icon: RiUploadCloudLine,
+    path: "/appfiles",
   },
 ];
