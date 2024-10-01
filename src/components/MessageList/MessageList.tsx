@@ -1,7 +1,8 @@
 import React from "react";
 
 interface Message {
-  type: "user" | "bot";
+  id: string;
+  role: "user" | "assistant";
   content: string;
 }
 
@@ -12,20 +13,20 @@ interface MessageListProps {
 const MessageList: React.FC<MessageListProps> = ({ messages }) => {
   return (
     <div className="flex-1 overflow-y-auto p-4">
-      {messages.map((message, index) => (
+      {messages.map((message) => (
         <div
-          key={index}
+          key={message.id}
           className={`mb-4 ${
-            message.type === "user" ? "text-right" : "text-left"
+            message.role === "user" ? "text-right" : "text-left"
           }`}>
-          <span
+          <div
             className={`inline-block p-2 rounded-lg ${
-              message.type === "user"
+              message.role === "user"
                 ? "bg-blue-500 text-white"
-                : "bg-white text-gray-800"
+                : "bg-gray-200 text-black"
             }`}>
             {message.content}
-          </span>
+          </div>
         </div>
       ))}
     </div>

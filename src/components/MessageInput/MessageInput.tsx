@@ -1,71 +1,99 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import Draft, { Editor, EditorState, ContentState } from "draft-js";
-import "draft-js/dist/Draft.css";
-
-// Reusable emptyContentState to avoid SSR issues
-const emptyContentState = Draft.convertFromRaw({
-  entityMap: {},
-  blocks: [
-    {
-      text: "",
-      key: "foo",
-      type: "unstyled",
-      entityRanges: [],
-      depth: 0,
-      inlineStyleRanges: [],
-    },
-  ],
-});
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 interface MessageInputProps {
   onSendMessage: (content: string) => void;
+  onStopGeneration: () => void;
+  isGenerating: boolean;
 }
 
-const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage }) => {
-  const [editorState, setEditorState] = useState(
-    EditorState.createWithContent(emptyContentState)
+const MessageInput: React.FC<MessageInputProps> = ({
+  onSendMessage,
+  onStopGeneration,
+  isGenerating,
+}) => {
+  const [editorContent, setEditorContent] = useState("");
+  const [isEditorVisible, setIsEditorVisible] = useState(true); // Changed to true for debugging
+  const [isUserActive, setIsUserActive] = useState(false);
+  const quillRef = useRef<ReactQuill>(null);
+
+  const handleUserActivity = useCallback(() => {
+    setIsUserActive(true);
+    setIsEditorVisible(true);
+  }, []);
+
+  useEffect(() => {
+    const handleKeyPress = () => handleUserActivity();
+
+    document.addEventListener("keydown", handleKeyPress);
+    document.addEventListener("mousemove", handleUserActivity);
+
+    const inactivityTimeout = setTimeout(() => {
+      if (!isUserActive) {
+        setIsEditorVisible(false);
+      }
+    }, 5000);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyPress);
+      document.removeEventListener("mousemove", handleUserActivity);
+      clearTimeout(inactivityTimeout);
+    };
+  }, [isUserActive, handleUserActivity]);
+
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      const text = quillRef.current?.getEditor().getText().trim();
+      if (text) {
+        console.log("Calling onSendMessage with:", text); // Debug log
+        onSendMessage(text);
+        setEditorContent("");
+        if (quillRef.current) {
+          quillRef.current.getEditor().setText("");
+        }
+      }
+    },
+    [onSendMessage]
   );
 
-  // Function to handle user input
-  const handleEditorChange = (newEditorState: EditorState) => {
-    setEditorState(newEditorState);
-
-    // Detect if user is typing
-    const text = newEditorState.getCurrentContent().getPlainText();
-  };
-
-  // Function to handle submit
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const contentState = editorState.getCurrentContent();
-    const text = contentState.getPlainText().trim();
-
-    if (text) {
-      onSendMessage(text);
-      setEditorState(EditorState.createWithContent(emptyContentState));
-    }
-  };
-
-
   return (
-    <form onSubmit={handleSubmit} className="p-4">
-      <div className="flex items-center border border-gray-800 bg-background rounded-l-lg px-4 py-2">
-        <div className="flex-1">
-          
-          <Editor
-            editorState={editorState}
-            onChange={handleEditorChange}
-            placeholder="Type '/' for quick access to the command menu. Use '||' to enter multiple prompts."
-          />
-        </div>
-        <button
-          type="submit"
-          className="text-foreground px-4 py-2 rounded-r-lg">
-          Send
-        </button>
-      </div>
-    </form>
+    <div>
+      {isEditorVisible && (
+        <form
+          onSubmit={handleSubmit}
+          className="p-4"
+          aria-label="Message Input">
+          <div className="flex items-center border border-gray-800 bg-background rounded-lg px-4 py-2">
+            <div className="flex-1">
+              <ReactQuill
+                ref={quillRef}
+                value={editorContent}
+                onChange={setEditorContent}
+                placeholder="Type '/' for quick access to the command menu. Use '||' to enter multiple prompts."
+                readOnly={isGenerating}
+              />
+            </div>
+            {isGenerating ? (
+              <button
+                type="button"
+                onClick={onStopGeneration}
+                className="text-white bg-red-500 px-4 py-2 rounded-r-lg ml-2">
+                Stop
+              </button>
+            ) : (
+              <button
+                type="submit"
+                className="text-white bg-blue-500 px-4 py-2 rounded-r-lg ml-2">
+                Send
+              </button>
+            )}
+          </div>
+        </form>
+      )}
+    </div>
   );
 };
 

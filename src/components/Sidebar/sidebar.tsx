@@ -9,7 +9,7 @@ const SideNavigation = () => {
         {DASHBOARD_ITEMS.map((dashboardItem) => {
           const Icon = dashboardItem.icon;
           return (
-            <div key={dashboardItem.path}>
+            <div key={dashboardItem.id}>
               <>
                 <div className="font-semibold text-body-small flex items-center p-5 gap-x-2">
                   <Icon className={`text-body-large font-medium`} />
