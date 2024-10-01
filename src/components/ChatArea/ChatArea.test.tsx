@@ -10,19 +10,21 @@ const mockMessages = [
 
 const mockOnSendMessage = jest.fn();
 
-describe("ChatInterface", () => {
-  it("renders MessageList and MessageInput", () => {
+describe("ChatArea Component", () => {
+  it("renders MessageList and MessageInput", async () => {
     render(
-      <ChatArea
-        messages={mockMessages}
-        onSendMessage={mockOnSendMessage}
-      />
+      <ChatArea messages={mockMessages} onSendMessage={mockOnSendMessage} />
     );
 
+    // Check if the user message is rendered
     expect(screen.getByText("Hello")).toBeInTheDocument();
+
+    // Check if the bot message is rendered
     expect(screen.getByText("Hi there!")).toBeInTheDocument();
+
+    // Check if the placeholder text is rendered
     expect(
-      screen.getByPlaceholderText("Type your message...")
+      screen.getByText(/Type '\/' for quick access to the command menu/i)
     ).toBeInTheDocument();
   });
 });

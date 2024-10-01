@@ -1,17 +1,28 @@
+// src/components/MessageInput/MessageInput.test.tsx
 import React from "react";
-import { render, screen } from "@testing-library/react";; 
+import { render, screen } from "@testing-library/react";
+import MessageInput from "./MessageInput"; 
 import "@testing-library/jest-dom";
-import MessageInput from "./MessageInput";
 
 describe("MessageInput Component", () => {
-  it("renders input field and send button", () => {
-    // Render the component. We are just checking for renders for the component as we will be using draft for rich text
-    render(<MessageInput onSendMessage={jest.fn()} />);
+  const mockOnSendMessage = jest.fn();
 
-    // Check if input and button are in the document
+  beforeEach(() => {
+    render(<MessageInput onSendMessage={mockOnSendMessage} />);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test("renders the editor and send button", () => {
+    // Check if the placeholder text is rendered correctly
     expect(
-      screen.getByPlaceholderText("Type your message...")
+      screen.getByText(/Type '\/' for quick access to the command menu/i)
     ).toBeInTheDocument();
-    expect(screen.getByText("Send")).toBeInTheDocument();
+
+    // Check if the send button is rendered
+    const sendButton = screen.getByRole("button", { name: /send/i });
+    expect(sendButton).toBeInTheDocument();
   });
 });
