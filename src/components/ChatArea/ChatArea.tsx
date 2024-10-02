@@ -11,7 +11,8 @@ interface Message {
 
 const Chat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
+  const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
 
   const handleSendMessage = useCallback(
     async (content: string) => {
@@ -49,6 +50,46 @@ const Chat: React.FC = () => {
     [messages]
   );
 
+  const handleEditMessage = useCallback(
+    async (id: string, newContent: string) => {
+      const updatedMessages = messages.map((msg) =>
+        msg.id === id ? { ...msg, content: newContent } : msg
+      );
+      setMessages(updatedMessages);
+      setEditingMessageId(null);
+
+      // Find the index of the edited message
+      const editedIndex = updatedMessages.findIndex((msg) => msg.id === id);
+
+      // Get all messages up to and including the edited message
+      const messagesUpToEdited = updatedMessages.slice(0, editedIndex + 1);
+
+      setIsGenerating(true);
+      try {
+        const assistantResponse = await getChatCompletion(messagesUpToEdited);
+        const newAssistantMessage: Message = {
+          id: Date.now().toString(),
+          role: "assistant",
+          content: assistantResponse,
+        };
+        setMessages([...messagesUpToEdited, newAssistantMessage]);
+      } catch (error) {
+        console.error("Error generating response:", error);
+      } finally {
+        setIsGenerating(false);
+      }
+    },
+    [messages]
+  );
+
+  const handleStartEditing = useCallback((id: string) => {
+    setEditingMessageId(id);
+  }, []);
+
+  const handleCancelEditing = useCallback(() => {
+    setEditingMessageId(null);
+  }, []);
+
   const handleStopGeneration = useCallback(() => {
     console.log("Stop generation requested"); // Debug log
     setIsGenerating(false);
@@ -56,7 +97,13 @@ const Chat: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen">
-      <MessageList messages={messages} />
+      <MessageList
+        messages={messages}
+        onStartEditing={handleStartEditing}
+        editingMessageId={editingMessageId}
+        onEditMessage={handleEditMessage}
+        onCancelEditing={handleCancelEditing}
+      />
       <MessageInput
         onSendMessage={handleSendMessage}
         onStopGeneration={handleStopGeneration}
