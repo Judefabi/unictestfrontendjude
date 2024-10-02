@@ -1,4 +1,6 @@
 import React from "react";
+import ReactMarkdown from "react-markdown";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 
 interface Message {
   id: string;
@@ -25,7 +27,37 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
                 ? "bg-blue-500 text-white"
                 : "bg-gray-200 text-black"
             }`}>
-            {message.content}
+            {message.role === "assistant" ? (
+              <ReactMarkdown
+                components={{
+                  code: ({
+                    node,
+                    inline,
+                    className,
+                    children,
+                    ...props
+                  }: any) => {
+                    const match = /language-(\w+)/.exec(className || "");
+                    return !inline && match ? (
+                      <SyntaxHighlighter
+                        // style={theme} 
+                        language={match[1]} // Language detected from className
+                        PreTag="div"
+                        {...props}>
+                        {String(children).replace(/\n$/, "")}
+                      </SyntaxHighlighter>
+                    ) : (
+                      <code className={className} {...props}>
+                        {children}
+                      </code>
+                    );
+                  },
+                }}>
+                {message.content}
+              </ReactMarkdown>
+            ) : (
+              message.content
+            )}
           </div>
         </div>
       ))}

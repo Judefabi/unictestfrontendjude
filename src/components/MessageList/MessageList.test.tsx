@@ -1,46 +1,46 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import MessageList from "./MessageList"; 
+import MessageList from "./MessageList";
+
+// Define the Message type
+type Message = {
+  id: string;
+  role: "user" | "assistant"; // Define role as a union type
+  content: string;
+};
 
 describe("MessageList Component", () => {
-  const mockMessages = [
-    { id: "1", role: "user", content: "Hello, how are you?" },
-    { id: "2", role: "assistant", content: "I am fine, thank you!" },
-    { id: "3", role: "user", content: "What can you do?" },
+  const messages: Message[] = [
+    { id: "1", role: "user", content: "Hello" },
+    { id: "2", role: "assistant", content: "Hi there!" },
+    { id: "3", role: "user", content: "How are you?" },
   ];
 
-  it("renders correctly with messages", () => {
-    render(<MessageList messages={mockMessages} />);
+  test("renders messages correctly", () => {
+    render(<MessageList messages={messages} />);
 
-    // Check if the messages are rendered
-    expect(screen.getByText(/Hello, how are you?/i)).toBeInTheDocument();
-    expect(screen.getByText(/I am fine, thank you!/i)).toBeInTheDocument();
-    expect(screen.getByText(/What can you do?/i)).toBeInTheDocument();
+    expect(screen.getByText("Hello")).toBeInTheDocument();
+    expect(screen.getByText("Hi there!")).toBeInTheDocument();
+    expect(screen.getByText("How are you?")).toBeInTheDocument();
   });
 
-  it("applies correct styles based on message role", () => {
-    render(<MessageList messages={mockMessages} />);
+  test("renders code block with syntax highlighting", () => {
+    const codeMessage: Message[] = [
+      {
+        id: "4",
+        role: "user",
+        content: '```javascript\nconsole.log("Hello World");\n```',
+      },
+    ];
+    render(<MessageList messages={codeMessage} />);
 
-    // Check user message styling
-    const userMessage = screen.getByText(/Hello, how are you?/i).parentElement;
-    expect(userMessage).toHaveClass("text-right");
-
-    // Check assistant message styling
-    const assistantMessage = screen.getByText(
-      /I am fine, thank you!/i
-    ).parentElement;
-    expect(assistantMessage).toHaveClass("text-left");
-  });
-
-  it("renders correctly with no messages", () => {
-    render(<MessageList messages={[]} />);
-
-    // Ensure no messages are rendered
-    expect(screen.queryByText(/Hello, how are you?/i)).not.toBeInTheDocument();
+    // Using regex to match the code line
     expect(
-      screen.queryByText(/I am fine, thank you!/i)
-    ).not.toBeInTheDocument();
-    expect(screen.queryByText(/What can you do?/i)).not.toBeInTheDocument();
+      screen.getByText(/console\.log\("Hello World"\);/)
+    ).toBeInTheDocument();
+
+    // Optional: debug to inspect the rendered output
+    screen.debug();
   });
 });

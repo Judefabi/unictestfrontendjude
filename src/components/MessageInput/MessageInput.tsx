@@ -55,6 +55,16 @@ const MessageInput: React.FC<MessageInputProps> = ({
           quillRef.current.getEditor().setText("");
         }
       }
+
+      // const htmlContent = quillRef.current?.getEditor().root.innerHTML;
+      // if (htmlContent) {
+      //   console.log("Calling onSendMessage with:", htmlContent); // Debug log
+      //   onSendMessage(htmlContent);
+      //   setEditorContent("");
+      //   if (quillRef.current) {
+      //     quillRef.current.getEditor().setText("");
+      //   }
+      // }
     },
     [onSendMessage]
   );

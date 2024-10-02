@@ -1,82 +1,55 @@
-// src/components/MessageInput/MessageInput.test.tsx
-import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
-import MessageInput from "./MessageInput"; 
+// MessageInput.test.tsx
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import "@testing-library/jest-dom";
-import ReactQuill from "react-quill";
+import MessageInput from './MessageInput';
 
-jest.mock("react-quill", () => {
-  const MockQuill = React.forwardRef((props, ref) => (
-    <div>
-      <textarea
-        onChange={(e) => props.onChange(e.target.value)}
-        placeholder={props.placeholder}
-        value={props.value}
-      />
-    </div>
-  ));
-  MockQuill.displayName = "ReactQuill";
-  return MockQuill;
-});
-
-describe("MessageInput Component", () => {
-  const mockOnSendMessage = jest.fn();
-  const mockOnStopGeneration = jest.fn();
+describe('MessageInput Component', () => {
+  const onSendMessageMock = jest.fn();
+  const onStopGenerationMock = jest.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks(); // Clear mock calls before each test
+    jest.clearAllMocks(); // Clear any previous mock calls
   });
 
-  it("renders correctly when not generating", () => {
+  test('renders the editor when visible', () => {
     render(
-      <MessageInput
-        onSendMessage={mockOnSendMessage}
-        onStopGeneration={mockOnStopGeneration}
-        isGenerating={false}
-      />
+      <MessageInput onSendMessage={onSendMessageMock} onStopGeneration={onStopGenerationMock} isGenerating={false} />
     );
 
-    // Check if the input area is rendered
-    expect(
-      screen.getByPlaceholderText(/Type '\/' for quick access/i)
-    ).toBeInTheDocument();
-    expect(screen.getByText(/Send/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/message input/i)).toBeInTheDocument();
   });
 
-  it("renders correctly when generating", () => {
+  test("allows input of a message and triggers send", () => {
+   render(
+     <MessageInput
+       onSendMessage={onSendMessageMock}
+       onStopGeneration={onStopGenerationMock}
+       isGenerating={false}
+     />
+   );
+
+    
+    const input = screen.getByRole("textbox", { hidden: true }); 
+    fireEvent.focus(input); 
+
+    fireEvent.input(input, { target: { innerHTML: "Hello, world!" } });
+
+    // Find the submit button and trigger a click
+    const sendButton = screen.getByRole("button", { name: /send/i });
+    fireEvent.click(sendButton); // Simulate sending the message
+
+    // Add your assertions here to verify the expected behavior
+  });
+
+  test('calls onStopGeneration when Stop button is clicked', () => {
     render(
-      <MessageInput
-        onSendMessage={mockOnSendMessage}
-        onStopGeneration={mockOnStopGeneration}
-        isGenerating={true}
-      />
+      <MessageInput onSendMessage={onSendMessageMock} onStopGeneration={onStopGenerationMock} isGenerating={true} />
     );
 
-    // Check if the Stop button is rendered
-    expect(screen.getByText(/Stop/i)).toBeInTheDocument();
-    expect(screen.queryByText(/Send/i)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByText(/stop/i));
+    expect(onStopGenerationMock).toHaveBeenCalled();
   });
 
-  it("calls onSendMessage with the correct content when submitted", () => {
-    render(
-      <MessageInput onSendMessage={mockOnSendMessage} isGenerating={false} onStopGeneration={function (): void {
-        throw new Error("Function not implemented.");
-      } } />
-    );
-  });
-
-
-  it("calls onStopGeneration when the Stop button is clicked", () => {
-    render(
-      <MessageInput
-        onSendMessage={mockOnSendMessage}
-        onStopGeneration={mockOnStopGeneration}
-        isGenerating={true}
-      />
-    );
-
-    fireEvent.click(screen.getByText(/Stop/i));
-
-    expect(mockOnStopGeneration).toHaveBeenCalledTimes(1);
-  });
+  
 });

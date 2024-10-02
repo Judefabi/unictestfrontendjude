@@ -10,6 +10,20 @@ const createJestConfig = nextJest({
 const config: Config = {
   coverageProvider: "v8",
   testEnvironment: "jsdom",
+  preset: "ts-jest", // Use ts-jest preset for TypeScript
+  // transform: {
+  //   "^.+\\.tsx?$": "ts-jest", // Transform TypeScript files
+  //   "^.+\\.jsx?$": "babel-jest", // Transform JavaScript files
+  // },
+
+  moduleNameMapper: {
+    //imports to be ignored by jest
+    "react-markdown": "<rootDir>/mock/empty-mock.tsx",
+  },
+
+  // transformIgnorePatterns: [
+  //   "/node_modules/(?!react-markdown)", // Transform react-markdown package
+  // ],
   // Add more setup options before each test is run
   // setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
 };
