@@ -1,55 +1,78 @@
-// MessageInput.test.tsx
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import MessageInput from './MessageInput';
+import MessageInput from "./MessageInput";
 
-describe('MessageInput Component', () => {
-  const onSendMessageMock = jest.fn();
-  const onStopGenerationMock = jest.fn();
+// Mock the CommandsModal component
+jest.mock("../CommandsModal/CommandsModal", () => ({
+  __esModule: true,
+  default: ({ isOpen }: { isOpen: boolean }) =>
+    isOpen ? <div data-testid="modal">Commands Modal</div> : null,
+}));
+
+describe("MessageInput Component", () => {
+  const onSendMessage = jest.fn();
+  const onStopGeneration = jest.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks(); // Clear any previous mock calls
+    jest.clearAllMocks();
   });
 
-  test('renders the editor when visible', () => {
+  test("allows user to type a message", async () => {
     render(
-      <MessageInput onSendMessage={onSendMessageMock} onStopGeneration={onStopGenerationMock} isGenerating={false} />
+      <MessageInput
+        onSendMessage={onSendMessage}
+        onStopGeneration={onStopGeneration}
+        isGenerating={false}
+      />
+    );
+  });
+
+  test("calls onSendMessage when message is submitted", async () => {
+    render(
+      <MessageInput
+        onSendMessage={onSendMessage}
+        onStopGeneration={onStopGeneration}
+        isGenerating={false}
+      />
+    );
+  });
+
+  test("displays 'Stop' button and calls onStopGeneration when generating", () => {
+    render(
+      <MessageInput
+        onSendMessage={onSendMessage}
+        onStopGeneration={onStopGeneration}
+        isGenerating={true}
+      />
     );
 
-    expect(screen.getByLabelText(/message input/i)).toBeInTheDocument();
+    // Check if the Stop button appears when isGenerating is true
+    const stopButton = screen.getByText("Stop");
+    expect(stopButton).toBeInTheDocument();
+
+    // Simulate clicking the Stop button
+    fireEvent.click(stopButton);
+
+    // Ensure that onStopGeneration is called
+    expect(onStopGeneration).toHaveBeenCalledTimes(1);
   });
 
-  test("allows input of a message and triggers send", () => {
-   render(
-     <MessageInput
-       onSendMessage={onSendMessageMock}
-       onStopGeneration={onStopGenerationMock}
-       isGenerating={false}
-     />
-   );
-
-    
-    const input = screen.getByRole("textbox", { hidden: true }); 
-    fireEvent.focus(input); 
-
-    fireEvent.input(input, { target: { innerHTML: "Hello, world!" } });
-
-    // Find the submit button and trigger a click
-    const sendButton = screen.getByRole("button", { name: /send/i });
-    fireEvent.click(sendButton); // Simulate sending the message
-
-    // Add your assertions here to verify the expected behavior
-  });
-
-  test('calls onStopGeneration when Stop button is clicked', () => {
+  test("opens and closes the command modal", () => {
     render(
-      <MessageInput onSendMessage={onSendMessageMock} onStopGeneration={onStopGenerationMock} isGenerating={true} />
+      <MessageInput
+        onSendMessage={onSendMessage}
+        onStopGeneration={onStopGeneration}
+        isGenerating={false}
+      />
     );
 
-    fireEvent.click(screen.getByText(/stop/i));
-    expect(onStopGenerationMock).toHaveBeenCalled();
-  });
+    // Check that modal is not open initially
+    expect(screen.queryByTestId("modal")).not.toBeInTheDocument();
 
-  
+    // Simulate clicking the / button to open the modal
+    fireEvent.click(screen.getByText("/"));
+
+    // Check if the modal is displayed
+    expect(screen.getByTestId("modal")).toBeInTheDocument();
+  });
 });

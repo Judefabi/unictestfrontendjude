@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 
@@ -14,14 +14,17 @@ const MessageEditInput: React.FC<MessageEditInputProps> = ({
   onCancel,
 }) => {
   const [editContent, setEditContent] = useState(initialContent);
+  const quillRef = useRef<ReactQuill>(null);
 
   const handleSave = () => {
-    onSave(editContent);
+    const plainText = quillRef.current?.getEditor().getText().trim(); // Get plain text without HTML tags
+    onSave(plainText || ""); // Pass plain text content
   };
 
   return (
     <div className="mb-4">
       <ReactQuill
+        ref={quillRef}
         value={editContent}
         onChange={setEditContent}
         placeholder="Edit your message..."
