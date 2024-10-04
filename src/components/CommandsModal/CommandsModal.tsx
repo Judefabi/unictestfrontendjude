@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import { X } from "lucide-react";
+import { FiLink } from "react-icons/fi";
+import { BiWorld } from "react-icons/bi";
 
 interface CommandsModalProps {
   isOpen: boolean;
@@ -12,6 +15,7 @@ const CommandsModal: React.FC<CommandsModalProps> = ({
   onInsert,
 }) => {
   const [url, setUrl] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [advanced, setAdvanced] = useState(false);
   const [maxTime, setMaxTime] = useState(300);
   const [filter, setFilter] = useState(true);
@@ -26,69 +30,115 @@ const CommandsModal: React.FC<CommandsModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-      <div
-        className="bg-white p-6 rounded-lg"
-        style={{ position: "absolute", bottom: "100px" }}>
-        <h2 className="text-xl font-bold mb-4">Insert Custom Command</h2>
-        <input
-          type="text"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          placeholder="Enter URL"
-          className="w-full p-2 border rounded mb-4"
+    <div className="bg-card text-card-foreground p-4 rounded-lg absolute left-5 bottom-40 z-50 w-[543px]">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-sm font-semibold">Commands</h2>
+        <X
+          size={18}
+          className="cursor-pointer font-semibold"
+          onClick={onClose}
         />
-        <div className="mb-4">
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              checked={advanced}
-              onChange={(e) => setAdvanced(e.target.checked)}
-              className="mr-2"
-            />
-            Advanced Options
-          </label>
-        </div>
-        {advanced && (
-          <div className="mb-4">
-            <input
-              type="number"
-              value={maxTime}
-              onChange={(e) => setMaxTime(Number(e.target.value))}
-              placeholder="Max Execution Time"
-              className="w-full p-2 border rounded mb-2"
-            />
-            <label className="flex items-center mb-2">
-              <input
-                type="checkbox"
-                checked={filter}
-                onChange={(e) => setFilter(e.target.checked)}
-                className="mr-2"
-              />
-              Filter
-            </label>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={store}
-                onChange={(e) => setStore(e.target.checked)}
-                className="mr-2"
-              />
-              Store
-            </label>
+      </div>
+
+      <div className="space-y-4">
+        <div className="bg-background p-5 rounded-md">
+          <div className="flex gap-x-1">
+            <BiWorld />
+            <span className="text-label-medium text-foreground font-semibold">
+              WEB SEARCH
+            </span>
           </div>
-        )}
-        <div className="flex justify-end">
-          <button
-            onClick={onClose}
-            className="mr-2 px-4 py-2 bg-gray-200 rounded">
-            Cancel
-          </button>
-          <button
-            onClick={handleInsert}
-            className="px-4 py-2 bg-blue-500 text-white rounded">
-            Insert
-          </button>
+          <div className="flex justify-between items-center gap-x-2">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search Term"
+              className="w-full bg-background text-muted-foreground text-[15px]"
+            />
+            <div className="space-x-2 flex items-center">
+              <button className="text-label-large bg-background border border-muted-foreground text-foreground p-2 rounded-lg">
+                Advanced
+              </button>
+              <button className="text-label-large bg-card text-card-foreground p-2 rounded-lg">
+                Insert
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-background p-5 rounded-md">
+          <div className="flex gap-x-1">
+            <FiLink />
+            <span className="text-label-medium text-foreground font-semibold">
+              INCLUDE URL
+            </span>
+          </div>
+          <div className="flex justify-between items-center gap-x-2">
+            <input
+              type="text"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="Enter URL"
+              className="w-full bg-background text-muted-foreground text-[15px]"
+            />
+            <div className="space-x-2 flex items-center">
+              <button
+                className="text-label-large bg-background border border-muted-foreground text-foreground p-2 rounded-lg"
+                onClick={() => setAdvanced(!advanced)}>
+                Advanced
+              </button>
+              <button
+                onClick={handleInsert}
+                className="text-label-large bg-card text-card-foreground p-2 rounded-lg">
+                Insert
+              </button>
+            </div>
+          </div>
+
+          {advanced && (
+            <div className="mt-4 space-y-3">
+              <div>
+                <label className="text-sm text-muted-foreground">
+                  Max Execution Time
+                </label>
+                <input
+                  type="number"
+                  value={maxTime}
+                  onChange={(e) => setMaxTime(Number(e.target.value))}
+                  className="w-full bg-background text-muted-foreground text-[15px] mt-1 p-2 rounded border border-muted-foreground"
+                />
+              </div>
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="filter"
+                  checked={filter}
+                  onChange={(e) => setFilter(e.target.checked)}
+                  className="mr-2"
+                />
+                <label
+                  htmlFor="filter"
+                  className="text-sm text-muted-foreground">
+                  Filter
+                </label>
+              </div>
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="store"
+                  checked={store}
+                  onChange={(e) => setStore(e.target.checked)}
+                  className="mr-2"
+                />
+                <label
+                  htmlFor="store"
+                  className="text-sm text-muted-foreground">
+                  Store
+                </label>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

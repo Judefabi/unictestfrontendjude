@@ -19,7 +19,7 @@ const links = [
 
 const QuickLinks = () => {
   return (
-    <div className="bg-card text-sm text-card-foreground cursor-pointer w-fit flex rounded-xl">
+    <div className="bg-card text-sm text-card-foreground cursor-pointer w-fit flex rounded-md">
       {links.map((link) => {
         const IconComponent = link.icon;
         return (

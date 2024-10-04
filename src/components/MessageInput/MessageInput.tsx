@@ -1,8 +1,10 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { FiSend } from "react-icons/fi"; 
-import { IoIosAdd, IoMdPerson, IoMdFlash, IoMdCode } from "react-icons/io"; 
+import { FiSend } from "react-icons/fi";
+import { RiSlashCommands2 } from "react-icons/ri";
+import { IoIosAdd, IoMdPerson, IoMdFlash, IoMdCode } from "react-icons/io";
+import { BiSolidQuoteLeft } from "react-icons/bi";
 import CommandsModal from "../CommandsModal/CommandsModal";
 
 interface MessageInputProps {
@@ -35,23 +37,11 @@ const MessageInput: React.FC<MessageInputProps> = ({
 
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === "/") {
-      e.preventDefault(); // Prevent default behavior
-      setIsModalOpen(true); // Open the Commands Modal when "/" is pressed
+      e.preventDefault();
+      setIsModalOpen(true);
     }
   };
 
-  // const handleSubmit = useCallback(async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   const text = quillRef.current?.getEditor().getText().trim();
-  //   if (text) {
-  //     // Handle message sending
-  //     setEditorContent("");
-  //     if (quillRef.current) {
-  //       quillRef.current.getEditor().setText("");
-  //     }
-  //   }
-  // }, []);
-  
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
@@ -101,7 +91,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
               onChange={setEditorContent}
               placeholder="Type your message..."
               readOnly={isGenerating}
-              className="border-none" // Removes ReactQuill's border
+              className="border-none"
             />
           </div>
 
@@ -117,30 +107,29 @@ const MessageInput: React.FC<MessageInputProps> = ({
             <button
               type="submit"
               className="flex items-center space-x-2 text-white px-4 py-2">
-              <FiSend className="text-lg" /> {/* Send icon */}
               <span>Send</span>
+              <FiSend className="text-lg" />
             </button>
           )}
         </div>
 
-        {/* New button row for Commands, Prompts, Personas, Add */}
-        <div className="flex justify-between mt-2">
+        <div className="flex mt-2 space-x-4">
           <button
             type="button"
-            onClick={() => setIsModalOpen(true)}
-            className="text-white flex items-center space-x-2">
-            <IoMdCode className="text-lg" />
+            onClick={() => setIsModalOpen(!isModalOpen)}
+            className="text-white flex font-semibold text-label-large items-center space-x-2">
+            <RiSlashCommands2 className="text-lg" />
             <span>Command</span>
           </button>
-          <button className="text-white flex items-center space-x-2">
-            <IoMdFlash className="text-lg" />
+          <button className="text-white flex font-semibold text-label-large items-center space-x-2">
+            <BiSolidQuoteLeft className="text-lg" />
             <span>Prompts</span>
           </button>
-          <button className="text-white flex items-center space-x-2">
+          <button className="text-white flex font-semibold text-label-large items-center space-x-2">
             <IoMdPerson className="text-lg" />
             <span>Personas</span>
           </button>
-          <button className="text-white flex items-center space-x-2">
+          <button className="text-white flex font-semibold text-label-large items-center space-x-2">
             <IoIosAdd className="text-lg" />
             <span>Add</span>
           </button>

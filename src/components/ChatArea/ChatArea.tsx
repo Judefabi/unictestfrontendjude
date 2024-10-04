@@ -1,8 +1,9 @@
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import MessageList from "../MessageList/MessageList";
 import MessageInput from "../MessageInput/MessageInput";
 import { getChatCompletion } from "@/utils/chatCompletion";
 import axios from "axios";
+import ScrapingProgressModal from "../ScrappingModal.tsx/ScrappingModal";
 
 interface Message {
   id: string;
@@ -20,132 +21,75 @@ interface ScrapingURL {
 }
 
 const ChatArea: React.FC = () => {
-  // const [messages, setMessages] = useState<Message[]>([]);
-  // dummy messages for testing UI
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      role: "user",
-      content: "Hello, how are you?",
-      isGenerating: false,
-      isScraping: false,
-    },
-    {
-      id: "2",
-      role: "assistant",
-      content: "I'm good, thank you! How can I help you today?",
-      isGenerating: false,
-      isScraping: false,
-    },
-    {
-      id: "3",
-      role: "user",
-      content: "Can you tell me about the weather?",
-      isGenerating: false,
-      isScraping: false,
-    },
-    {
-      id: "4",
-      role: "assistant",
-      content: "Sure! The weather today is sunny with a high of 25°C.",
-      isGenerating: false,
-      isScraping: false,
-    },
-    {
-      id: "5",
-      role: "assistant",
-      content:
-        "Hello! I'm here to help you. Here's an example of a Python function that returns a list of items:\n\n```python\n def get_items():\n    return ['item1', 'item2', 'item3']\n```",
-      isGenerating: false,
-      isScraping: false,
-    },
-    {
-      id: "6",
-      role: "user",
-      content:
-        "Thanks for the code! Here's a long message from me with some markdown text:\n\n**Bold text**, _italic text_, and a list:\n\n- First item\n- Second item\n- Third item\n\nCould you also explain how I can use async/await for making API calls in JavaScript?",
-      isGenerating: false,
-      isScraping: false,
-    },
-    {
-      id: "7",
-      role: "assistant",
-      content:
-        "Certainly! Here's how you can use async/await for API calls in JavaScript:\n\n```javascript\n async function fetchData() {\n   try {\n     const response = await fetch('https://api.example.com/data');\n     const data = await response.json();\n     console.log(data);\n   } catch (error) {\n     console.error('Error fetching data:', error);\n   }\n }\n```",
-      isGenerating: false,
-      isScraping: false,
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
 
   const isGeneratingRef = useRef(false);
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const [scrapingUrls, setScrapingUrls] = useState<ScrapingURL[]>([]);
+  const [showScrapingModal, setShowScrapingModal] = useState(false);
 
-  const scrapeWebsite = async (messageId: string, url: string) => {
-    try {
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === messageId
-            ? {
-                ...msg,
-                scrapingUrls: [
-                  ...(msg.scrapingUrls || []),
-                  { url, progress: 0, status: "scraping" },
-                ],
-              }
-            : msg
+  const updateScrapingUrl = useCallback(
+    (url: string, updates: Partial<ScrapingURL>) => {
+      setScrapingUrls((prevUrls) =>
+        prevUrls.map((item) =>
+          item.url === url ? { ...item, ...updates } : item
         )
       );
+    },
+    []
+  );
 
-      for (let progress = 25; progress <= 100; progress += 25) {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === messageId
-              ? {
-                  ...msg,
-                  scrapingUrls: msg.scrapingUrls?.map((item) =>
-                    item.url === url ? { ...item, progress } : item
-                  ),
-                }
-              : msg
-          )
-        );
+  const scrapeWebsite = useCallback(
+    async (messageId: string, url: string) => {
+      let currentProgress = 0;
+
+      try {
+        // console.log(`Starting scraping for: ${url}`);
+
+        setScrapingUrls((prev) => [
+          ...prev,
+          { url, progress: 0, status: "scraping" },
+        ]);
+        setShowScrapingModal(true);
+
+        const intervalId = setInterval(() => {
+          if (currentProgress < 100) {
+            currentProgress += 20;
+            updateScrapingUrl(url, { progress: currentProgress });
+          } else {
+            clearInterval(intervalId);
+            updateScrapingUrl(url, { status: "complete" });
+          }
+        }, 1000); //checking teh progress of date ScrapING process to update the UI accordingly
+
+        const response = await axios.post("/api/scrape", { url });
+        // console.log(`Response for ${url}:`, response.data.content);
+
+        clearInterval(intervalId);
+        updateScrapingUrl(url, { progress: 100, status: "complete" });
+
+        return response.data.content;
+      } catch (error) {
+        // console.error(`Error scraping ${url}:`, error);
+        updateScrapingUrl(url, { status: "error" });
+        return null;
       }
+    },
+    [updateScrapingUrl]
+  );
 
-      const response = await axios.post("/api/scrape", { url });
-
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === messageId
-            ? {
-                ...msg,
-                scrapingUrls: msg.scrapingUrls?.map((item) =>
-                  item.url === url ? { ...item, status: "complete" } : item
-                ),
-              }
-            : msg
-        )
-      );
-
-      return response.data.content;
-    } catch (error) {
-      console.error("Error scraping website:", error);
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === messageId
-            ? {
-                ...msg,
-                scrapingUrls: msg.scrapingUrls?.map((item) =>
-                  item.url === url ? { ...item, status: "error" } : item
-                ),
-              }
-            : msg
-        )
-      );
-      return null;
+  useEffect(() => {
+    const allComplete = scrapingUrls.every(
+      (url) => url.status === "complete" || url.status === "error"
+    );
+    if (allComplete && scrapingUrls.length > 0) {
+      setTimeout(() => {
+        setScrapingUrls([]);
+        setShowScrapingModal(false);
+      }, 2000);
     }
-  };
+  }, [scrapingUrls]);
 
   const parseCustomCommands = async (
     messageId: string,
@@ -333,8 +277,70 @@ const ChatArea: React.FC = () => {
           isGenerating={isGeneratingRef.current}
         />
       </div>
+      {showScrapingModal && (
+        <ScrapingProgressModal
+          urls={scrapingUrls}
+          onClose={() => setShowScrapingModal(false)}
+        />
+      )}
     </div>
   );
 };
 
 export default ChatArea;
+
+// dummy messages for testing UI without needing to make API calls. This thread was generated by GPT-4
+// const [messages, setMessages] = useState<Message[]>([
+//   {
+//     id: "1",
+//     role: "user",
+//     content: "Hello, how are you?",
+//     isGenerating: false,
+//     isScraping: false,
+//   },
+//   {
+//     id: "2",
+//     role: "assistant",
+//     content: "I'm good, thank you! How can I help you today?",
+//     isGenerating: false,
+//     isScraping: false,
+//   },
+//   {
+//     id: "3",
+//     role: "user",
+//     content: "Can you tell me about the weather?",
+//     isGenerating: false,
+//     isScraping: false,
+//   },
+//   {
+//     id: "4",
+//     role: "assistant",
+//     content: "Sure! The weather today is sunny with a high of 25°C.",
+//     isGenerating: false,
+//     isScraping: false,
+//   },
+//   {
+//     id: "5",
+//     role: "assistant",
+//     content:
+//       "Hello! I'm here to help you. Here's an example of a Python function that returns a list of items:\n\n```python\n def get_items():\n    return ['item1', 'item2', 'item3']\n```",
+//     isGenerating: false,
+//     isScraping: false,
+//   },
+//   {
+//     id: "6",
+//     role: "user",
+//     content:
+//       "Thanks for the code! Here's a long message from me with some markdown text:\n\n**Bold text**, _italic text_, and a list:\n\n- First item\n- Second item\n- Third item\n\nCould you also explain how I can use async/await for making API calls in JavaScript?",
+//     isGenerating: false,
+//     isScraping: false,
+//   },
+//   {
+//     id: "7",
+//     role: "assistant",
+//     content:
+//       "Certainly! Here's how you can use async/await for API calls in JavaScript:\n\n```javascript\n async function fetchData() {\n   try {\n     const response = await fetch('https://api.example.com/data');\n     const data = await response.json();\n     console.log(data);\n   } catch (error) {\n     console.error('Error fetching data:', error);\n   }\n }\n```",
+//     isGenerating: false,
+//     isScraping: false,
+//   },
+// ]);

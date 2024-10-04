@@ -3,14 +3,7 @@ import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import MessageEditInput from "../MessageEditInput/MessageEditInput";
-import ScrapingProgressModal from "../ScrappingModal.tsx/ScrappingModal";
 import QuickLinks from "../QuickLinks/QuickLinks";
-
-interface ScrapingURL {
-  url: string;
-  progress: number;
-  status: "pending" | "scraping" | "complete" | "error";
-}
 
 interface Message {
   id: string;
@@ -19,7 +12,6 @@ interface Message {
   isScraping?: boolean;
   isGenerating?: boolean;
   isTrimmed?: boolean;
-  scrapingUrls?: ScrapingURL[];
 }
 
 interface MessageListProps {
@@ -77,15 +69,16 @@ const MessageList: React.FC<MessageListProps> = ({
             ) : (
               <div
                 className={`inline-block p-2 rounded-lg max-w-[695px] space-y-3`}>
+                {/* keeping this for user experience purposes */}
                 {message.isScraping ? (
                   <div>
                     <p
                       className="text-sm text-gray-500 cursor-pointer hover:text-gray-700 mt-2"
                       onClick={() => setSelectedScrapingMessage(message)}>
-                      Scraping in progress... (click to view details)
+                      Scraping in progress...
                     </p>
                   </div>
-                ) : !message.isScraping && message.isGenerating ? (
+                ) : message.isGenerating ? (
                   <p className="text-sm text-gray-500">
                     Generating response...
                   </p>
@@ -158,7 +151,7 @@ const MessageList: React.FC<MessageListProps> = ({
                     ) : (
                       <>
                         {/* User Message */}
-                        <p className="text-body-large bg-card text-card-foreground rounded-xl p-7 text-left">
+                        <p className="text-body-large bg-card text-card-foreground rounded-xl p-4 text-left">
                           {message.content}
                         </p>
                         {/* Edit Button */}
@@ -186,12 +179,13 @@ const MessageList: React.FC<MessageListProps> = ({
         );
       })}
 
-      {selectedScrapingMessage?.scrapingUrls && (
+      {/* Move management of scraping to chatarea so we can pop up the scarpping modal as sites scrape instead of the button like we are doing now */}
+      {/* {selectedScrapingMessage?.scrapingUrls && (
         <ScrapingProgressModal
           urls={selectedScrapingMessage.scrapingUrls}
           onClose={() => setSelectedScrapingMessage(null)}
         />
-      )}
+      )} */}
       <div ref={bottomRef} />
     </div>
   );
