@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import { SidebarProvider } from "@/contexts/SidebarContext";
 import { Suspense } from "react";
 
 const inter = Inter({
@@ -16,7 +15,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Simsuls",
+  title: "UNIC Test",
   description: "",
 };
 

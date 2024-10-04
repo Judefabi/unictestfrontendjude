@@ -1,11 +1,14 @@
 "use client";
-import { redirect } from "next/navigation";
-import React, { useEffect } from "react";
+
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 
 export default function Page() {
+  const router = useRouter();
+
   useEffect(() => {
-    redirect("/dashboard");
-  }, []);
+    router.push("/dashboard"); // Client-side navigation
+  }, [router]);
 
   return null;
 }
