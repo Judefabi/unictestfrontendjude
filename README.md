@@ -2,7 +2,7 @@
 
 ## Overview
 
-The **LLM Wrapper Chat** is a web-based application that provides an interface for users to interact with an LLM (Large Language Model) model (Phi - Microsoft Research LLM). It includes features such as a WYSIWYG editor, custom command handling, and web scraping for enhanced user interactions with LLM responses.
+The **LLM Wrapper Chat** is a web-based application that provides an interface for users to interact with an LLM (Large Language Model) model (Phi - Microsoft Research LLM). It includes features such as a WYSIWYG editor, custom command handling, and web scraping for enhanced user interactions with LLM responses. For CI/CD, I used Github Actions to deploy to vercel. the pipeline ensures proper testing by running component tests before deploying to Vercel.
 
 ## Development Notes
 
