@@ -1,5 +1,6 @@
 import { RiBookFill, RiHistoryFill, RiUploadCloudLine } from "react-icons/ri";
 
+// with these as constants, teh dashboard items can be reused anywhere within the app and also adding a new Item or removing is also easier without having to go change the navigation code itself.
 export const DASHBOARD_ITEMS = [
   {
     id: 1,

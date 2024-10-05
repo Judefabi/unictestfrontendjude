@@ -5,7 +5,7 @@ import { useEffect } from "react";
 
 export default function Page() {
   useEffect(() => {
-    redirect("/dashboard"); // Client-side navigation
+    redirect("/dashboard"); // server-side navigation to redirect the page to dashboard automatically once the url loads
   }, []);
 
   return null;

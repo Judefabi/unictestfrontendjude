@@ -13,12 +13,14 @@ interface ScrapingProgressModalProps {
   onClose: () => void;
 }
 
+// this is teh scrapping modal that allows us to monitor the progress of the websites being scrapped
 const ScrapingProgressModal: React.FC<ScrapingProgressModalProps> = ({
   urls,
   onClose,
 }) => {
   // console.log("Modal re-render with URLs:", urls); // Log when modal re-renders to test if UI updates okay
 
+  // this assigns the proper status color depending on teh staus value gotten
   const getStatusColor = (status: ScrapingURL["status"]) => {
     switch (status) {
       case "complete":
@@ -30,6 +32,8 @@ const ScrapingProgressModal: React.FC<ScrapingProgressModalProps> = ({
     }
   };
 
+
+// simialrly this handles the status icon to return it programatically
   const getStatusIcon = (status: ScrapingURL["status"]) => {
     switch (status) {
       case "complete":

@@ -3,6 +3,7 @@ import { ChevronDown, User } from "lucide-react";
 import Image from "next/image";
 
 const Header: React.FC = () => {
+  // This is the main header. To cut time writing teh skeleton code, I described the layout to GPT-4 and got the code before proceeding to add styling 
   return (
     <header className="fixed z-50 top-0 left-0 w-full flex items-center justify-between bg-background text-foreground px-5 py-2">
       {/* Part 1: Logo */}

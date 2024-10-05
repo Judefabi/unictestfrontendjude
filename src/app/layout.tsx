@@ -25,6 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    // with a more indepth app, we should add things like error boundaries and other UX pages to enahnce user experience with the app and custmize it to suite the brand 
     <html lang="en">
       <body
         suppressHydrationWarning={true}

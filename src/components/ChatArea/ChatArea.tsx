@@ -5,6 +5,7 @@ import { getChatCompletion } from "@/utils/chatCompletion";
 import axios from "axios";
 import ScrapingProgressModal from "../ScrappingModal.tsx/ScrappingModal";
 
+// given that this is a rather small applications, the interfaces are defined here needed but in complex cases we would use different files to manage these interfaces
 interface Message {
   id: string;
   role: "user" | "assistant";
@@ -19,6 +20,8 @@ interface ScrapingURL {
   progress: number;
   status: "pending" | "scraping" | "complete" | "error";
 }
+
+// being teh parent, this chat area will control most states and functions required globally in teh children and thus are shared using props since they are not deeply nested.
 
 const ChatArea: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -40,6 +43,7 @@ const ChatArea: React.FC = () => {
     []
   );
 
+  // this function handles scraping of the website  including calling teh scraping endpoint and handles results and updating data
   const scrapeWebsite = useCallback(
     async (messageId: string, url: string) => {
       let currentProgress = 0;
@@ -61,7 +65,7 @@ const ChatArea: React.FC = () => {
             clearInterval(intervalId);
             updateScrapingUrl(url, { status: "complete" });
           }
-        }, 1000); //checking teh progress of date ScrapING process to update the UI accordingly
+        }, 1000); //checking the progress of date ScrapING process to update the UI accordingly
 
         const response = await axios.post("/api/scrape", { url });
         // console.log(`Response for ${url}:`, response.data.content);
@@ -80,6 +84,7 @@ const ChatArea: React.FC = () => {
   );
 
   useEffect(() => {
+    // This useeffect helps track the progress of tehs craping and updating the data on that prigrammatically
     const allComplete = scrapingUrls.every(
       (url) => url.status === "complete" || url.status === "error"
     );
@@ -135,7 +140,7 @@ const ChatArea: React.FC = () => {
       let assistantMessageId: string;
 
       if (messageId) {
-        // Editing an existing message
+        // Editing an existing message. by using teh ID, we can change the respons eteh user gets without having to create a new message on the list. This enhances user experience and to do this later in a better way, we can have persistence so that we can show users a list of responses they gt for a certain thread as in ChatGPT
         userMessageId = messageId;
         assistantMessageId =
           messages.find(
@@ -220,6 +225,7 @@ const ChatArea: React.FC = () => {
           )
         );
       } catch (error) {
+        // log for teh different errors in terms of getting a response from the LLM
         if (axios.isCancel(error)) {
           console.log("Request canceled:", error.message);
         } else {
@@ -229,10 +235,11 @@ const ChatArea: React.FC = () => {
           prev.filter((msg) => msg.id !== assistantMessageId)
         );
       } finally {
+        // keep track of teh isgenerating ref for application and UI purposes
         isGeneratingRef.current = false;
       }
     },
-    [messages]
+    [messages] 
   );
 
   // we are using teh abortcontroller so that the generation will be stopped at the getCompletion function. This idea comes from how GPT-4 handles stopping
@@ -243,10 +250,12 @@ const ChatArea: React.FC = () => {
     }
   }, []);
 
+  // handles when user clicks on the edit button
   const handleStartEditing = useCallback((id: string) => {
     setEditingMessageId(id);
   }, []);
 
+  // handle when user saves the edit thus triggering the process of communicating with the LLM
   const handleEditMessage = useCallback(
     async (id: string, newContent: string) => {
       setEditingMessageId(null);
@@ -255,6 +264,7 @@ const ChatArea: React.FC = () => {
     [handleSendMessage]
   );
 
+  // handle when user cancels the editing request thus closing the editing input
   const handleCancelEditing = useCallback(() => {
     setEditingMessageId(null);
   }, []);
@@ -350,34 +360,34 @@ export default ChatArea;
 // ]);
 
 // const [scrapingUrls, setScrapingUrls] = useState<ScrapingURL[]>([
-  //   {
-  //     url: "https://medium.com/@mircea.calugaru/react-quill-editor-with-full-toolbar-options-and-custom-buttons-undo-redo-176d79f8d375",
-  //     progress: 100,
-  //     status: "complete",
-  //   },
-  //   {
-  //     url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Working_with_Objects",
-  //     progress: 50,
-  //     status: "scraping",
-  //   },
-  //   {
-  //     url: "https://www.smashingmagazine.com/2018/06/ux-product-design/",
-  //     progress: 75,
-  //     status: "scraping",
-  //   },
-  //   {
-  //     url: "https://www.example.com/nonexistent-page",
-  //     progress: 0,
-  //     status: "error",
-  //   },
-  //   {
-  //     url: "https://css-tricks.com/snippets/css/a-guide-to-flexbox/",
-  //     progress: 25,
-  //     status: "scraping",
-  //   },
-  //   {
-  //     url: "https://www.google.com/",
-  //     progress: 0,
-  //     status: "pending",
-  //   },
-  // ]);
+//   {
+//     url: "https://medium.com/@mircea.calugaru/react-quill-editor-with-full-toolbar-options-and-custom-buttons-undo-redo-176d79f8d375",
+//     progress: 100,
+//     status: "complete",
+//   },
+//   {
+//     url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Working_with_Objects",
+//     progress: 50,
+//     status: "scraping",
+//   },
+//   {
+//     url: "https://www.smashingmagazine.com/2018/06/ux-product-design/",
+//     progress: 75,
+//     status: "scraping",
+//   },
+//   {
+//     url: "https://www.example.com/nonexistent-page",
+//     progress: 0,
+//     status: "error",
+//   },
+//   {
+//     url: "https://css-tricks.com/snippets/css/a-guide-to-flexbox/",
+//     progress: 25,
+//     status: "scraping",
+//   },
+//   {
+//     url: "https://www.google.com/",
+//     progress: 0,
+//     status: "pending",
+//   },
+// ]);

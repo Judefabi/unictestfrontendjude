@@ -6,6 +6,8 @@ const Header: React.FC = () => {
     "stream" | "parallel" | "sequential"
   >("stream");
 
+  // this is the inner header. For effciiency, I described the layout to GPT-4 and I was able to get teh skeleton of the component then proceeded to add styling accordingly
+
   return (
     <header className="fixed top-[60px] w-full lg:max-w-[1254px] xl:max-w-[1600px]  px-5 z-50 flex items-center justify-between bg-background text-foreground p-4 border-b border-t border-card ">
       {/* Part 1: Task Label with Writing Icon */}

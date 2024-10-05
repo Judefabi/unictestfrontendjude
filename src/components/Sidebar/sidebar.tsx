@@ -41,6 +41,7 @@ const SideNavigation = () => {
             );
           })}
         </div>
+        {/* Footer section of the sidebar that contains additional functonalities that are not aprt of the navigation */}
         <SidebarFooter />
       </div>
     </nav>

@@ -35,6 +35,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
     }
   }, []);
 
+  // track f user presses the command key in this case "/" thus poping up the commands modal for better User experience
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === "/") {
       e.preventDefault();
@@ -42,6 +43,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
     }
   };
 
+  // handle user subitting their prompt and thsu triggering the entire prompt lifecycle
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
@@ -57,6 +59,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
     [onSendMessage]
   );
 
+  // handles user inserting a url from the commands modal. in this we track the cursor position thus inserting the url where the user has their cursor. This ensures that the user prompt is promperly writen after scraping and thus the LL gets to understand the prompt
   const handleInsertCommand = (command: string) => {
     const editor = quillRef.current?.getEditor();
     if (editor) {
@@ -113,6 +116,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
           )}
         </div>
 
+        {/* These are teh extra input options. I opted not to give them their own component to reduce complexity but in cases where every button has a function, using a separet component will make it easier to handle and mantain clean code */}
         <div className="flex justify-between items-center">
           <div className="flex mt-2 space-x-4">
             <button

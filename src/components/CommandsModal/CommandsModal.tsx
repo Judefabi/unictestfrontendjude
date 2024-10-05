@@ -23,6 +23,8 @@ const CommandsModal: React.FC<CommandsModalProps> = ({
 
   if (!isOpen) return null;
 
+
+  // this function handles inserting the comamnd to into teh prompt from teh commands modal and it takes a default filter and maxtime value but with sue state, users can change these values
   const handleInsert = () => {
     const command = `[include-url: ${url} max_execution_time:${maxTime} filter:${filter} store:${store}]`;
     onInsert(command);
@@ -95,7 +97,8 @@ const CommandsModal: React.FC<CommandsModalProps> = ({
               </button>
             </div>
           </div>
-
+ 
+          {/* tese advanced options are shown if the user clicks on advances but otherwise they are hidden by default */}
           {advanced && (
             <div className="mt-4 space-y-3">
               <div>

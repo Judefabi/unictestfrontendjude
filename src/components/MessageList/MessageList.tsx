@@ -5,6 +5,7 @@ import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import MessageEditInput from "../MessageEditInput/MessageEditInput";
 import QuickLinks from "../QuickLinks/QuickLinks";
 
+// interfaces for the messages list component
 interface Message {
   id: string;
   role: "user" | "assistant";
@@ -42,7 +43,7 @@ const MessageList: React.FC<MessageListProps> = ({
     }
   }, [messages]); // Trigger the effect whenever the messages change
 
-  let firstAssistantMessageShown = false; // To track the first assistant message for UI rendering purposes
+  let firstAssistantMessageShown = false; // To track the first assistant message for UI enhancement purposes
 
   return (
     <div className="flex-1 overflow-y-auto p-4 w-[960px] mt-[200px]">
@@ -69,7 +70,7 @@ const MessageList: React.FC<MessageListProps> = ({
             ) : (
               <div
                 className={`inline-block p-2 rounded-lg max-w-[695px] space-y-3`}>
-                {/* keeping this for user experience purposes */}
+                {/* keeping this for user experience purposes to show scraping progress indication even if user closes scraping modal */}
                 {message.isScraping ? (
                   <div>
                     <p
@@ -79,6 +80,7 @@ const MessageList: React.FC<MessageListProps> = ({
                     </p>
                   </div>
                 ) : message.isGenerating ? (
+                  // show this as user awaits for the LLM response
                   <p className="text-sm text-gray-500">
                     Generating response...
                   </p>
@@ -94,7 +96,7 @@ const MessageList: React.FC<MessageListProps> = ({
                           </div>
                         )}
 
-                        {/* Section 2: The response content */}
+                        {/* Section 2: The response content. This will allow us to render markdown */}
                         <div className="text-body-large">
                           <ReactMarkdown
                             components={{
@@ -109,6 +111,7 @@ const MessageList: React.FC<MessageListProps> = ({
                                   className || ""
                                 );
                                 return !inline && match ? (
+                                  // syntax higlighter helps to show LLM responses that contain code
                                   <SyntaxHighlighter
                                     style={atomDark}
                                     language={match[1]}
@@ -122,6 +125,7 @@ const MessageList: React.FC<MessageListProps> = ({
                                   </code>
                                 );
                               },
+                              // when rendering markdowns, react markdown fails to properly handle things like lists, block quotes and table so i added this section to handle lists specifically but various additions can be done as the LLM response tyles grow
                               ol: ({ ordered, ...props }: any) => (
                                 <ol className="list-decimal pl-4" {...props} />
                               ),
@@ -146,6 +150,7 @@ const MessageList: React.FC<MessageListProps> = ({
                         </div>
 
                         {/* Section 3: Quick Links */}
+                        {/* made this a reusbale component to allow easy management of teh functionalities */}
                         <QuickLinks />
                       </>
                     ) : (
@@ -154,7 +159,7 @@ const MessageList: React.FC<MessageListProps> = ({
                         <p className="text-body-large bg-card text-card-foreground rounded-xl p-4 text-left">
                           {message.content}
                         </p>
-                        {/* Edit Button */}
+                        {/* Edit Butto. this button will replace the user input ubble with an editing containing istead of having to edit from teh main input container thus better user experience */}
                         <div className="flex gap-x-3 justify-end">
                           <button
                             onClick={() => onStartEditing(message.id)}
@@ -166,6 +171,7 @@ const MessageList: React.FC<MessageListProps> = ({
                       </>
                     )}
 
+                    {/* with longer inut and reponses, the tokens limit is exceed and thus I introduced a trimming functionality as a temporary fix  */}
                     {message.isTrimmed && (
                       <p className="text-xs text-red-500 mt-1">
                         Note: This message was trimmed due to token limits.
