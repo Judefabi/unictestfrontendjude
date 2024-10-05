@@ -95,7 +95,7 @@ const MessageList: React.FC<MessageListProps> = ({
                         {isFirstAssistantMessage && (
                           <div className="text-label-large text-muted-foreground uppercase font-bold ">
                             World-Class React/Front-End Developer .{" "}
-                            <span className="capitalize">Phi - Micsrosft</span>
+                            <span className="capitalize">Phi - Microsoft</span>
                           </div>
                         )}
 
