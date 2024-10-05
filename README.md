@@ -26,6 +26,7 @@ This approach allowed me to focus more on the functionality and design while ens
 
 - Advanced command options like `max_execution_time`, `filter`, and `store` are customizable.
 - Default command parameters for easier user interaction.
+- Scraping UI to track progress of scraping
 
 ## Setup Instructions
 
