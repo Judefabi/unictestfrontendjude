@@ -42,6 +42,3 @@ jobs:
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-# project id prj_V5v4FFvu5M4ttaG9VStNJPDOwl8A
-# vercel token mTUSyr2qu19CIMedMpDZH9xf
-# org id fwu3r6AOqAqCFCBg27hx2aZ6
