@@ -1,9 +1,22 @@
 import React, { useState, useCallback, useRef, useEffect } from "react";
-import MessageList from "../MessageList/MessageList";
-import MessageInput from "../MessageInput/MessageInput";
 import { getChatCompletion } from "@/utils/chatCompletion";
 import axios from "axios";
-import ScrapingProgressModal from "../ScrappingModal.tsx/ScrappingModal";
+import dynamic from "next/dynamic";
+
+// Use dynamic imports to fetch components..this will optimize our perfomance and help load the page faster.
+// we are however disabling ssr because we are using react-quill which uses document which is client side
+const MessageList = dynamic(() => import("../MessageList/MessageList"), {
+  ssr: false,
+});
+const MessageInput = dynamic(() => import("../MessageInput/MessageInput"), {
+  ssr: false,
+});
+const ScrapingProgressModal = dynamic(
+  () => import("../ScrappingModal.tsx/ScrappingModal"),
+  {
+    ssr: false,
+  }
+);
 
 // given that this is a rather small applications, the interfaces are defined here needed but in complex cases we would use different files to manage these interfaces
 interface Message {
@@ -239,7 +252,7 @@ const ChatArea: React.FC = () => {
         isGeneratingRef.current = false;
       }
     },
-    [messages] 
+    [messages]
   );
 
   // we are using teh abortcontroller so that the generation will be stopped at the getCompletion function. This idea comes from how GPT-4 handles stopping

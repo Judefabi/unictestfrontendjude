@@ -1,8 +1,3 @@
-import axios from "axios";
-
-const API_URL =
-  "https://api-inference.huggingface.co/models/microsoft/Phi-3-mini-4k-instruct/v1/chat/completions";
-const API_TOKEN = process.env.NEXT_PUBLIC_HUGGINGFACE_API_TOKEN;
 const MAX_TOKENS = 4096;
 const MAX_INPUT_TOKENS = MAX_TOKENS - 500;
 
@@ -49,25 +44,26 @@ function trimInputMessages(messages: Message[]): Message[] {
   return trimmedMessages.reverse();
 }
 
-async function query(messages: Message[], signal: AbortSignal) {
-  const response = await axios.post(
-    API_URL,
-    {
-      model: "microsoft/Phi-3-mini-4k-instruct",
-      messages: messages,
-      max_tokens: 500,
-      stream: false,
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${API_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-      signal: signal, // Include the abort signal here
-    }
-  );
-  return response.data;
-}
+// async function query(messages: Message[], signal: AbortSignal) {
+//   const response = await axios.post(
+//     API_URL,
+//     {
+//       model: "microsoft/Phi-3-mini-4k-instruct",
+//       messages: messages,
+//       max_tokens: 500,
+//       stream: false,
+//     },
+//     {
+//       headers: {
+//         Authorization: `Bearer ${API_TOKEN}`,
+//         "Content-Type": "application/json",
+//       },
+//       signal: signal, // Include the abort signal here to control cancelling of requests globally
+//     }
+//   );
+//   return response.data;
+// }
+
 export async function getChatCompletion(
   messages: Message[],
   signal: AbortSignal,
@@ -132,62 +128,20 @@ export async function getChatCompletion(
     }
 
     return partialResponse; // Return the full response after streaming completes
-  } catch (error) {
-    if (error.name === "AbortError") {
-      console.log("Request aborted by user.");
-      // Update the UI with whatever partial response was available before aborting
-      updateMessageDisplay(partialResponse);
-      return ""; // Return an empty string instead of partialResponse
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.name === "AbortError") {
+        console.log("Request aborted by user.");
+        // Update the UI with whatever partial response was available before aborting
+        updateMessageDisplay(partialResponse);
+        return "Response generation Cancelled"; // Return an error message instead of partialResponse
+      }
+      console.error("Error getting chat completion:", error.message);
+      return "Sorry, there was an error processing your request.";
+    } else {
+      // Handle cases where the error is not an instance of Error (unlikely in this case)
+      console.error("Unknown error getting chat completion:", error);
+      return "Sorry, an unknown error occurred.";
     }
-    console.error("Error getting chat completion:", error);
-    return "Sorry, there was an error processing your request.";
   }
 }
-
-
-// export async function getChatCompletion(
-//   messages: Message[],
-//   signal: AbortSignal // Accept a second argument for aborting
-// ): Promise<string> {
-//   console.log("getChatCompletion called", messages);
-
-//   const trimmedMessages = trimInputMessages(messages);
-
-//   try {
-//     const response = await query(trimmedMessages, signal); // Pass the signal here
-//     console.log("Got response", response.choices[0].message.content);
-//     return response.choices[0].message.content;
-//   } catch (error) {
-//     // Check if the error was due to abortion and return empty instead of custom errors
-//     if (axios.isCancel(error)) {
-//       console.log("Request aborted by user. No response returned.");
-//       return ""; // Return an empty string if use cancelled the prompt
-//     }
-
-//     console.error("Error getting chat completion:", error);
-
-//     if (axios.isAxiosError(error) && error.response?.data?.error) {
-//       const errorMessage = error.response.data.error;
-
-//       if (
-//         errorMessage.includes("Input validation error") &&
-//         errorMessage.includes("tokens")
-//       ) {
-//         return (
-//           "I apologize, but the conversation history has become too long for me to process. " +
-//           "I've preserved your most recent message but had to trim some earlier context. " +
-//           "If this affects my understanding, please feel free to rephrase or provide additional context."
-//         );
-//       }
-
-//       if (
-//         errorMessage ===
-//         "Request failed during generation: Server error: CANCELLED"
-//       ) {
-//         return "I'm sorry, but it seems the server is currently overloaded. Please try again in a moment.";
-//       }
-//     }
-
-//     return "Sorry, I encountered an error while processing your request. Please try again later.";
-//   }
-// }

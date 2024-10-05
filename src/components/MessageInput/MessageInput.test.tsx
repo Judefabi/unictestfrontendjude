@@ -5,7 +5,7 @@ import MessageInput from "./MessageInput";
 // Mock ReactQuill component
 jest.mock("react-quill", () => ({
   __esModule: true,
-  default: ({ value, onChange }: any) => (
+  default: ({ value, onChange }: { value: string; onChange: any }) => (
     <textarea
       data-testid="quill-editor"
       value={value}

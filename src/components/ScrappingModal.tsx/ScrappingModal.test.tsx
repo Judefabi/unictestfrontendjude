@@ -1,6 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { X } from "lucide-react";
 import ScrapingProgressModal from "./ScrappingModal";
 
 describe("ScrapingProgressModal Component", () => {

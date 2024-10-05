@@ -1,11 +1,11 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
 import { FiSend } from "react-icons/fi";
 import { RiSlashCommands2 } from "react-icons/ri";
-import { IoIosAdd, IoMdPerson, IoMdFlash, IoMdCode } from "react-icons/io";
+import { IoIosAdd, IoMdPerson } from "react-icons/io";
 import { BiSolidQuoteLeft } from "react-icons/bi";
 import CommandsModal from "../CommandsModal/CommandsModal";
+import "react-quill/dist/quill.snow.css";
 
 interface MessageInputProps {
   onSendMessage: (content: string) => Promise<void>;
@@ -47,7 +47,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      const text = quillRef.current?.getEditor().getText().trim();
+      const text = quillRef.current?.getEditor().getText().trim(); // Get plain text without HTML tags...with formatting, we would pass html tags too
       if (text) {
         await onSendMessage(text);
         setEditorContent("");
@@ -64,15 +64,21 @@ const MessageInput: React.FC<MessageInputProps> = ({
     const editor = quillRef.current?.getEditor();
     if (editor) {
       const range = editor.getSelection();
+
       if (!range) {
         editor.focus();
         const length = editor.getLength();
-        editor.setSelection(length, 0);
+        editor.setSelection(length, 0); // Focus at the end if no selection
       }
+
       const newRange = editor.getSelection();
+
       if (newRange) {
         editor.insertText(newRange.index, command);
-        editor.setSelection(newRange.index + command.length);
+        editor.setSelection({
+          index: newRange.index + command.length,
+          length: 0, // This ensures that the cursor is placed after the inserted text
+        });
         setEditorContent(editor.getText());
       }
     }

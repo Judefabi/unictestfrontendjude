@@ -8,7 +8,15 @@ window.HTMLElement.prototype.scrollIntoView = jest.fn();
 // Mock components used within MessageList
 jest.mock("../MessageEditInput/MessageEditInput", () => ({
   __esModule: true,
-  default: ({ initialContent, onSave, onCancel }: any) => (
+  default: ({
+    initialContent,
+    onSave,
+    onCancel,
+  }: {
+    initialContent: string;
+    onSave: any;
+    onCancel: any;
+  }) => (
     <div data-testid="edit-input">
       <textarea data-testid="edit-textarea" defaultValue={initialContent} />
       <button onClick={() => onSave("New content")}>Save</button>
@@ -19,7 +27,7 @@ jest.mock("../MessageEditInput/MessageEditInput", () => ({
 
 jest.mock("../ScrappingModal.tsx/ScrappingModal", () => ({
   __esModule: true,
-  default: ({ urls, onClose }: any) => (
+  default: ({ onClose }: { onClose: any }) => (
     <div data-testid="scraping-modal">
       <p>Scraping in progress...</p>
       <button onClick={onClose}>Close</button>

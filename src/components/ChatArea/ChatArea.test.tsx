@@ -8,7 +8,15 @@ window.HTMLElement.prototype.scrollIntoView = jest.fn();
 // Mock the ReactQuill component to avoid testing its internals
 jest.mock("react-quill", () => ({
   __esModule: true,
-  default: ({ value, onChange, readOnly }: any) => (
+  default: ({
+    value,
+    onChange,
+    readOnly,
+  }: {
+    value: string;
+    onChange: any;
+    readOnly: boolean;
+  }) => (
     <div>
       <textarea
         data-testid="quill-editor"
@@ -35,6 +43,4 @@ test("adds user message and AI response when message is sent", async () => {
 
   // Ensure the user's message is rendered
   expect(screen.getByText("Hello, AI!")).toBeInTheDocument();
-
-  
 });

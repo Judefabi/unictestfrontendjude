@@ -17,7 +17,7 @@ const MessageEditInput: React.FC<MessageEditInputProps> = ({
   const quillRef = useRef<ReactQuill>(null);
 
   const handleSave = () => {
-    const plainText = quillRef.current?.getEditor().getText().trim(); // Get plain text without HTML tags
+    const plainText = quillRef.current?.getEditor().getText().trim(); // Get plain text without HTML tags...with formatting, we would pass html tags too
     onSave(plainText || ""); // Pass plain text content
   };
 

@@ -1,9 +1,17 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
-import MessageEditInput from "../MessageEditInput/MessageEditInput";
 import QuickLinks from "../QuickLinks/QuickLinks";
+import dynamic from "next/dynamic";
+
+// changed to dynamic import to prevent failures due to react-quill using document which causes crashes as the app will try to render this on the server side. This also improves perfoamnce and initial load times
+const MessageEditInput = dynamic(
+  () => import("../MessageEditInput/MessageEditInput"),
+  {
+    ssr: false,
+  }
+);
 
 // interfaces for the messages list component
 interface Message {
@@ -30,9 +38,6 @@ const MessageList: React.FC<MessageListProps> = ({
   onEditMessage,
   onCancelEditing,
 }) => {
-  const [selectedScrapingMessage, setSelectedScrapingMessage] =
-    useState<Message | null>(null);
-
   // Ref for the bottom of the message list
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -73,9 +78,7 @@ const MessageList: React.FC<MessageListProps> = ({
                 {/* keeping this for user experience purposes to show scraping progress indication even if user closes scraping modal */}
                 {message.isScraping ? (
                   <div>
-                    <p
-                      className="text-sm text-gray-500 cursor-pointer hover:text-gray-700 mt-2"
-                      onClick={() => setSelectedScrapingMessage(message)}>
+                    <p className="text-sm text-gray-500 cursor-pointer hover:text-gray-700 mt-2">
                       Scraping in progress...
                     </p>
                   </div>
