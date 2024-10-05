@@ -19,6 +19,8 @@ const config: Config = {
   moduleNameMapper: {
     //imports to be ignored by jest
     "react-markdown": "<rootDir>/mock/empty-mock.tsx",
+    "react-syntax-highlighter/dist/esm/styles/prism":
+      "<rootDir>/mock/empty-mock.tsx",
   },
 
   // transformIgnorePatterns: [

@@ -22,7 +22,6 @@ interface ScrapingURL {
 
 const ChatArea: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
-
   const isGeneratingRef = useRef(false);
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -30,6 +29,7 @@ const ChatArea: React.FC = () => {
   const [showScrapingModal, setShowScrapingModal] = useState(false);
 
   const updateScrapingUrl = useCallback(
+    // update the urls being scraped
     (url: string, updates: Partial<ScrapingURL>) => {
       setScrapingUrls((prevUrls) =>
         prevUrls.map((item) =>
@@ -98,7 +98,7 @@ const ChatArea: React.FC = () => {
     const urlRegex =
       /\[include-url: (.*?) max_execution_time:(\d+) filter:(true|false) store:(true|false)\]/g;
 
-    // Explicitly convert the result of matchAll to an array to avoid typescript warnings
+    // Explicitly convert the result of matchAll to an array to avoid typescript warnings. This idea was aid by Claude
     const matches = Array.from(content.matchAll(urlRegex));
 
     let parsedContent = content;
@@ -106,6 +106,7 @@ const ChatArea: React.FC = () => {
       const [fullMatch, url] = match;
       const scrapedContent = await scrapeWebsite(messageId, url);
 
+      // check if scrapping happend and replace url with scrapped content. Initially, this check was not there and some urls were "ESCAPING" being scrapped causing errors in the LLM. With GPT-4 i was able to debug and identify teh source of the leak
       if (scrapedContent) {
         parsedContent = parsedContent.replace(fullMatch, scrapedContent);
       } else {
@@ -122,7 +123,7 @@ const ChatArea: React.FC = () => {
   const handleSendMessage = useCallback(
     async (content: string, messageId?: string) => {
       if (isGeneratingRef.current) {
-        console.warn("Already generating a response, skipping new request.");
+        // console.warn("Already generating a response, skipping new request.");
         return;
       }
 
@@ -170,6 +171,7 @@ const ChatArea: React.FC = () => {
         ]);
       }
 
+      // ?checking if there is the url command in the message that the user input using regex thus handling scraping if need be
       const urlCommand = content.match(/\[include-url:/);
       let parsedContent = content;
 
@@ -180,6 +182,7 @@ const ChatArea: React.FC = () => {
           )
         );
 
+        // if their is url command send to the parseCommand function to handle scraping
         parsedContent = await parseCustomCommands(userMessageId, content);
 
         setMessages((prev) =>
@@ -232,10 +235,11 @@ const ChatArea: React.FC = () => {
     [messages]
   );
 
+  // we are using teh abortcontroller so that the generation will be stopped at the getCompletion function. This idea comes from how GPT-4 handles stopping
   const handleStopGeneration = useCallback(() => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
-      console.log("Generation stopped by user.");
+      // console.log("Generation stopped by user.");
     }
   }, []);
 
@@ -344,3 +348,36 @@ export default ChatArea;
 //     isScraping: false,
 //   },
 // ]);
+
+// const [scrapingUrls, setScrapingUrls] = useState<ScrapingURL[]>([
+  //   {
+  //     url: "https://medium.com/@mircea.calugaru/react-quill-editor-with-full-toolbar-options-and-custom-buttons-undo-redo-176d79f8d375",
+  //     progress: 100,
+  //     status: "complete",
+  //   },
+  //   {
+  //     url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Working_with_Objects",
+  //     progress: 50,
+  //     status: "scraping",
+  //   },
+  //   {
+  //     url: "https://www.smashingmagazine.com/2018/06/ux-product-design/",
+  //     progress: 75,
+  //     status: "scraping",
+  //   },
+  //   {
+  //     url: "https://www.example.com/nonexistent-page",
+  //     progress: 0,
+  //     status: "error",
+  //   },
+  //   {
+  //     url: "https://css-tricks.com/snippets/css/a-guide-to-flexbox/",
+  //     progress: 25,
+  //     status: "scraping",
+  //   },
+  //   {
+  //     url: "https://www.google.com/",
+  //     progress: 0,
+  //     status: "pending",
+  //   },
+  // ]);

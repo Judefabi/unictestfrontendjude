@@ -45,7 +45,7 @@ const MessageList: React.FC<MessageListProps> = ({
   let firstAssistantMessageShown = false; // To track the first assistant message for UI rendering purposes
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 w-[960px]">
+    <div className="flex-1 overflow-y-auto p-4 w-[960px] mt-[200px]">
       {messages.map((message) => {
         const isFirstAssistantMessage =
           message.role === "assistant" && !firstAssistantMessageShown;
@@ -57,7 +57,7 @@ const MessageList: React.FC<MessageListProps> = ({
         return (
           <div
             key={message.id}
-            className={`mb-10  ${
+            className={`mb-10   ${
               message.role === "user" ? "text-right" : "text-left"
             }`}>
             {editingMessageId === message.id ? (

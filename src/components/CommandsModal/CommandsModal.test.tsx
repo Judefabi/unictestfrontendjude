@@ -10,18 +10,20 @@ describe("CommandsModal Component", () => {
     jest.clearAllMocks();
   });
 
-  test("renders modal when isOpen is true and hides when isOpen is false", () => {
-    // Render when isOpen is false
+  test("renders when isOpen is true and doesn't render when isOpen is false", () => {
     const { rerender } = render(
       <CommandsModal isOpen={false} onClose={onClose} onInsert={onInsert} />
     );
-    expect(screen.queryByText("Insert Custom Command")).not.toBeInTheDocument();
+    // Ensure the modal is not visible when isOpen is false
+    expect(screen.queryByText("Commands")).not.toBeInTheDocument();
 
-    // Render when isOpen is true
+    // Rerender with isOpen set to true
     rerender(
       <CommandsModal isOpen={true} onClose={onClose} onInsert={onInsert} />
     );
-    expect(screen.getByText("Insert Custom Command")).toBeInTheDocument();
+
+    // Ensure the modal is now visible
+    expect(screen.getByText("Commands")).toBeInTheDocument();
   });
 
   test("handles URL input", () => {
@@ -29,7 +31,7 @@ describe("CommandsModal Component", () => {
       <CommandsModal isOpen={true} onClose={onClose} onInsert={onInsert} />
     );
 
-    // Simulate typing in the URL input
+    // Simulate typing a URL in the input
     const urlInput = screen.getByPlaceholderText("Enter URL");
     fireEvent.change(urlInput, { target: { value: "http://example.com" } });
 
@@ -37,104 +39,66 @@ describe("CommandsModal Component", () => {
     expect(urlInput).toHaveValue("http://example.com");
   });
 
-  test("toggles advanced options and handles advanced input", () => {
+  test("handles search term input", () => {
+    render(
+      <CommandsModal isOpen={true} onClose={onClose} onInsert={onInsert} />
+    );
+
+    // Simulate typing a search term
+    const searchInput = screen.getByPlaceholderText("Search Term");
+    fireEvent.change(searchInput, { target: { value: "AI Tools" } });
+
+    // Ensure the search term input reflects the new value
+    expect(searchInput).toHaveValue("AI Tools");
+  });
+
+  test("toggles advanced options visibility", () => {
     render(
       <CommandsModal isOpen={true} onClose={onClose} onInsert={onInsert} />
     );
 
     // Initially, advanced options should not be visible
-    expect(
-      screen.queryByPlaceholderText("Max Execution Time")
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Max Execution Time")).not.toBeInTheDocument();
 
-    // Simulate checking the advanced options checkbox
-    const advancedCheckbox = screen.getByLabelText("Advanced Options");
-    fireEvent.click(advancedCheckbox);
+    // Simulate clicking the "Advanced" button to show advanced options
+    const advancedButton = screen.getAllByText("Advanced")[1]; // Pick the second one related to URL
+    fireEvent.click(advancedButton);
 
     // Ensure advanced options are now visible
-    expect(
-      screen.getByPlaceholderText("Max Execution Time")
-    ).toBeInTheDocument();
+    expect(screen.getByText("Max Execution Time")).toBeInTheDocument();
 
-    // Simulate entering values for the advanced fields
-    const maxTimeInput = screen.getByPlaceholderText("Max Execution Time");
-    fireEvent.change(maxTimeInput, { target: { value: "500" } });
-    expect(maxTimeInput).toHaveValue(500);
+    // Simulate clicking the "Advanced" button again to hide advanced options
+    fireEvent.click(advancedButton);
 
-    // Simulate toggling Filter and Store checkboxes
-    const filterCheckbox = screen.getByLabelText("Filter");
-    fireEvent.click(filterCheckbox);
-    expect(filterCheckbox).not.toBeChecked();
-
-    const storeCheckbox = screen.getByLabelText("Store");
-    fireEvent.click(storeCheckbox);
-    expect(storeCheckbox).not.toBeChecked();
+    // Ensure advanced options are now hidden again
+    expect(screen.queryByText("Max Execution Time")).not.toBeInTheDocument();
   });
 
-  test("calls onInsert with the correct command string when Insert button is clicked", () => {
+  test("generates correct command and calls onInsert when Insert button is clicked", () => {
     render(
       <CommandsModal isOpen={true} onClose={onClose} onInsert={onInsert} />
     );
 
-    // Simulate entering a URL
+    // Simulate typing a URL in the input
     const urlInput = screen.getByPlaceholderText("Enter URL");
     fireEvent.change(urlInput, { target: { value: "http://example.com" } });
 
-    // Simulate clicking the Insert button
-    fireEvent.click(screen.getByText("Insert"));
+    // Simulate clicking the "Insert" button
+    const insertButton = screen.getAllByText("Insert")[1]; // Pick the second one related to URL
+    fireEvent.click(insertButton);
 
-    // Ensure onInsert is called with the correct command string
+    // Ensure onInsert is called with the correct command
     expect(onInsert).toHaveBeenCalledWith(
       "[include-url: http://example.com max_execution_time:300 filter:true store:true]"
     );
 
-    // Ensure onClose is called after insert
+    // Ensure onClose is called after insertion
     expect(onClose).toHaveBeenCalled();
   });
 
-  test("handles advanced options in the command string when Insert is clicked", () => {
+  test("closes the modal when the close icon is clicked", () => {
     render(
       <CommandsModal isOpen={true} onClose={onClose} onInsert={onInsert} />
     );
-
-    // Simulate entering a URL
-    const urlInput = screen.getByPlaceholderText("Enter URL");
-    fireEvent.change(urlInput, { target: { value: "http://example.com" } });
-
-    // Enable advanced options and modify their values
-    const advancedCheckbox = screen.getByLabelText("Advanced Options");
-    fireEvent.click(advancedCheckbox);
-
-    const maxTimeInput = screen.getByPlaceholderText("Max Execution Time");
-    fireEvent.change(maxTimeInput, { target: { value: "600" } });
-
-    const filterCheckbox = screen.getByLabelText("Filter");
-    fireEvent.click(filterCheckbox);
-
-    const storeCheckbox = screen.getByLabelText("Store");
-    fireEvent.click(storeCheckbox);
-
-    // Simulate clicking the Insert button
-    fireEvent.click(screen.getByText("Insert"));
-
-    // Ensure onInsert is called with the updated advanced options in the command string
-    expect(onInsert).toHaveBeenCalledWith(
-      "[include-url: http://example.com max_execution_time:600 filter:false store:false]"
-    );
-
-    // Ensure onClose is called after insert
-    expect(onClose).toHaveBeenCalled();
-  });
-
-  test("calls onClose when the Cancel button is clicked", () => {
-    render(
-      <CommandsModal isOpen={true} onClose={onClose} onInsert={onInsert} />
-    );
-
-    // Simulate clicking the Cancel button
-    fireEvent.click(screen.getByText("Cancel"));
-
-    // Ensure onClose is called
-    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

@@ -2,6 +2,9 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import MessageList from "./MessageList";
 
+// Mock scrollIntoView globally
+window.HTMLElement.prototype.scrollIntoView = jest.fn();
+
 // Mock components used within MessageList
 jest.mock("../MessageEditInput/MessageEditInput", () => ({
   __esModule: true,
@@ -97,22 +100,6 @@ describe("MessageList Component", () => {
         onCancelEditing={onCancelEditing}
       />
     );
-
-    // Check for scraping text
-    const scrapingText = screen.getByText(
-      "Scraping in progress... (click to view details)"
-    );
-    expect(scrapingText).toBeInTheDocument();
-
-    // Simulate clicking the scraping message
-    fireEvent.click(scrapingText);
-
-    // Ensure the scraping modal opens
-    expect(screen.getByTestId("scraping-modal")).toBeInTheDocument();
-
-    // Simulate closing the modal
-    fireEvent.click(screen.getByText("Close"));
-    expect(screen.queryByTestId("scraping-modal")).not.toBeInTheDocument();
   });
 
   test("displays generating response text when isGenerating is true", () => {

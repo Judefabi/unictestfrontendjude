@@ -8,16 +8,13 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-
   return (
-    <section className="flex h-screen w-full">
+    <section className="flex-col flex h-screen w-full">
+      <Header />
       <div className="flex flex-row h-full w-full">
-        <Sidebar/>
+        <Sidebar />
         <div className="flex flex-col w-full h-full overflow-hidden">
-          <Header />
-          <ContentWrapper>
-            {children}
-          </ContentWrapper>
+          <ContentWrapper>{children}</ContentWrapper>
         </div>
       </div>
     </section>

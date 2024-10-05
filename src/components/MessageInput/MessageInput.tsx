@@ -79,19 +79,19 @@ const MessageInput: React.FC<MessageInputProps> = ({
     <>
       <form
         onSubmit={handleSubmit}
-        className="w-[960px]"
+        className="w-[960px] space-y-4"
         aria-label="Message Input">
         {/* Input Container */}
-        <div className="border border-gray-800 bg-background rounded-lg flex items-center px-4 py-2">
+        <div className="border border-[#797979] bg-background rounded-lg flex items-end px-4 py-2">
           {/* Input area (ReactQuill) */}
           <div className="flex-1">
             <ReactQuill
               ref={quillRef}
               value={editorContent}
               onChange={setEditorContent}
-              placeholder="Type your message..."
+              placeholder="Type '/' for quick access to the command menu. Use '||' to enter multiple prompts."
               readOnly={isGenerating}
-              className="border-none"
+              className="custom-quill-editor"
             />
           </div>
 
@@ -113,26 +113,29 @@ const MessageInput: React.FC<MessageInputProps> = ({
           )}
         </div>
 
-        <div className="flex mt-2 space-x-4">
-          <button
-            type="button"
-            onClick={() => setIsModalOpen(!isModalOpen)}
-            className="text-white flex font-semibold text-label-large items-center space-x-2">
-            <RiSlashCommands2 className="text-lg" />
-            <span>Command</span>
-          </button>
-          <button className="text-white flex font-semibold text-label-large items-center space-x-2">
-            <BiSolidQuoteLeft className="text-lg" />
-            <span>Prompts</span>
-          </button>
-          <button className="text-white flex font-semibold text-label-large items-center space-x-2">
-            <IoMdPerson className="text-lg" />
-            <span>Personas</span>
-          </button>
-          <button className="text-white flex font-semibold text-label-large items-center space-x-2">
-            <IoIosAdd className="text-lg" />
-            <span>Add</span>
-          </button>
+        <div className="flex justify-between items-center">
+          <div className="flex mt-2 space-x-4">
+            <button
+              type="button"
+              onClick={() => setIsModalOpen(!isModalOpen)}
+              className="text-white flex font-semibold text-label-large items-center space-x-2">
+              <RiSlashCommands2 className="text-lg" />
+              <span>Command</span>
+            </button>
+            <button className="text-white flex font-semibold text-label-large items-center space-x-2">
+              <BiSolidQuoteLeft className="text-lg" />
+              <span>Prompts</span>
+            </button>
+            <button className="text-white flex font-semibold text-label-large items-center space-x-2">
+              <IoMdPerson className="text-lg" />
+              <span>Personas</span>
+            </button>
+            <button className="text-white flex font-semibold text-label-large items-center space-x-2">
+              <IoIosAdd className="text-lg" />
+              <span>Add</span>
+            </button>
+          </div>
+          <div className="text-muted-foreground font-semibold">32/618</div>
         </div>
       </form>
 

@@ -17,16 +17,16 @@ const ScrapingProgressModal: React.FC<ScrapingProgressModalProps> = ({
   urls,
   onClose,
 }) => {
-  console.log("Modal re-render with URLs:", urls); // Log when modal re-renders
+  // console.log("Modal re-render with URLs:", urls); // Log when modal re-renders to test if UI updates okay
 
   const getStatusColor = (status: ScrapingURL["status"]) => {
     switch (status) {
       case "complete":
-        return "text-green-500";
+        return "text-[#40AE54]";
       case "error":
         return "text-red-500";
       default:
-        return "text-blue-500";
+        return "text-[#9B9B9B]";
     }
   };
 
@@ -34,66 +34,75 @@ const ScrapingProgressModal: React.FC<ScrapingProgressModalProps> = ({
     switch (status) {
       case "complete":
         return (
-          <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center">
-            <X size={12} />
+          <div className="w-6 h-6 rounded-full bg-[#40AE5429] flex items-center justify-center">
+            <X color="#40AE54" size={12} />
           </div>
         );
       case "error":
         return (
-          <div className="w-4 h-4 rounded-full bg-red-500 flex items-center justify-center">
+          <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center">
             <X size={12} />
           </div>
         );
       default:
         return (
-          <div className="w-4 h-4 rounded-full border-2 border-gray-500 border-t-blue-500 animate-spin"></div>
+          <div className="w-6 h-6 rounded-full bg-[#9B9B9B] flex items-center justify-center">
+            <X size={12} />
+          </div>
         );
     }
   };
 
   return (
     <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center p-4"
-      onClick={onClose}>
+      className=" flex items-center absolute bottom-40 justify-center p-4 h-fit"
+      // onClick={onClose}
+    >
       <div
-        className="bg-gray-900 text-white rounded-lg p-4 w-full max-w-md"
+        className="bg-card   text-card-foreground rounded-lg p-4 w-[768px] max-w-full"
         onClick={(e) => e.stopPropagation()}>
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="font-semibold">Website Scraping Progress</h3>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-200">
-            <X size={20} />
-          </button>
-        </div>
-        <div className="space-y-4 max-h-[400px] overflow-y-auto">
+        <div className="space-y-4  overflow-y-auto scroll-bar">
           {urls.map((item, index) => (
-            <div key={index} className="space-y-2">
+            <div key={index} className="space-y-2 py-1">
               <div className="flex items-center space-x-2">
                 {getStatusIcon(item.status)}
-                <p className="text-sm truncate flex-1">{item.url}</p>
-                <span className={`text-sm ${getStatusColor(item.status)}`}>
+                <p className="text-label-medium truncate flex-1">{item.url}</p>
+                <span
+                  className={`text-label-medium ${getStatusColor(
+                    item.status
+                  )}`}>
                   {item.status}
                 </span>
               </div>
-              <Progress value={item.progress} className="h-2" />
+              <Progress
+                value={item.progress}
+                className={`h-[3px] ${
+                  item.progress == 100
+                    ? "[&>*]:bg-[#9B9B9B]"
+                    : "[&>*]:bg-[#2AABBC]"
+                } `}
+              />
             </div>
           ))}
         </div>
-        <div className="mt-4 pt-2 border-t border-gray-700">
-          <button
-            onClick={onClose}
-            className="w-full text-sm text-gray-400 hover:text-white">
-            Cancel All
-          </button>
-        </div>
-        <div className="mt-2 text-xs text-gray-500">
-          Searching {urls.length} of 10 websites
+        <div className="flex bg-[##2D2D2D] justify-between py-1 mt-2">
+          <div className="flex items-center space-x-2 w-fit">
+            <div className="w-6 h-6 rounded-full bg-background flex items-center justify-center">
+              <X size={12} />
+            </div>
+            <button
+              onClick={onClose}
+              className=" text-sm text-gray-400 hover:text-white">
+              Cancel All
+            </button>
+          </div>
+          <div className="mt-2 text-xs text-gray-500">
+            Searching {urls.length} of x websites
+          </div>
         </div>
       </div>
     </div>
   );
 };
-
 
 export default ScrapingProgressModal;

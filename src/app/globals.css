@@ -14,7 +14,7 @@ body {
 
 @layer base {
   :root {
-    --background: 224 71.4% 4.1%;
+    --background: 0, 0%, 7%, 1;
     --foreground: 210 20% 98%;
     --card: 0, 0%, 13%, 1;
     --card-foreground: 210 20% 98%;
@@ -39,8 +39,6 @@ body {
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
-  
-
 
   .dark {
     --background: 0 0% 100%;
@@ -104,6 +102,26 @@ body {
 
 .scroll-bar-x:hover {
   overflow-x: auto;
+}
+
+.custom-quill-editor .ql-editor.ql-blank::before {
+  color: #797979; /* Change this to your desired placeholder color */
+  font-size: 16px;
+}
+
+.custom-quill-editor {
+  /* Remove the outer border */
+  border: none !important;
+}
+
+.custom-quill-editor .ql-toolbar {
+  border: none !important;
+  padding: 8px 0; /* Adjust padding as needed */
+}
+
+/* Remove border from the content area */
+.custom-quill-editor .ql-container {
+  border: none !important;
 }
 
 @layer base {
