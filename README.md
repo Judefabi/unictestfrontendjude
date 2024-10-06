@@ -72,7 +72,7 @@ This project includes a simple web scraper that handles the `include-url` comman
 
 ## CI/CD Deployment
 
-The app is deployed using Github Actions CI/CD on Vercel. The current live version can be found here: [text](https://unictestfrontendjude.vercel.app/dashboard)
+The app is deployed using Github Actions CI/CD on Vercel. The current live version can be found here: [App demo](https://unictestfrontendjude.vercel.app/dashboard)
 
 ## Usage
 
